@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jianeye.cuckoo3.webside.financialProduct.mapper.FinancialProductMapper">
+  <!--mybatis ehcache缓存配置,以下两个<cache>标签二选一,第一个可以输出日志,第二个不输出日志 -->
+  <cache type="org.mybatis.caches.ehcache.LoggingEhcache"/> 
+  <!-- <cache type="org.mybatis.caches.ehcache.EhcacheCache"/> -->
+	
+  <resultMap id="financialProductMap" type="com.jianeye.cuckoo3.webside.financialProduct.model.FinancialProduct">
+    <id column="f_id" property="id" />
+    <result column="f_title" jdbcType="VARCHAR" property="title" />
+    <result column="f_subtitle" jdbcType="VARCHAR" property="subtitle" />
+    <result column="f_summary" jdbcType="VARCHAR" property="summary" />
+    <result column="f_delete_status" jdbcType="INTEGER" property="deleteStatus" />
+    <result column="u_group_name" jdbcType="VARCHAR" property="groupName" />
+    <result column="f_creator_id" jdbcType="INTEGER" property="creatorId" />
+    <result column="f_creator_name" jdbcType="VARCHAR" property="creatorName" />
+    <result column="f_create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="f_update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  
+  
+  <resultMap extends="financialProductMap" id="financialProductAllMap" type="com.jianeye.cuckoo3.webside.financialProduct.model.FinancialProduct">
+    <result column="f_content" jdbcType="LONGVARCHAR" property="content" />
+    <collection property="attachments" ofType="com.jianeye.cuckoo3.webside.attachment.model.Attachment">
+		<id column="id" property="id" />
+	    <result column="name" property="name" />
+	    <result column="type" property="type" />
+	    <result column="size" property="size" />
+	    <result column="path" property="path" />
+	    <result column="url" property="url" />
+	    <result column="fk_table" property="fkTable" />
+	    <result column="fk_id_name" property="fkIdName" />
+	    <result column="fk_id" property="fkId" />
+	    <result column="status" property="status" />
+	    <result column="creator_id" property="creatorId" />
+	    <result column="creator_name" property="creatorName" />
+	    <result column="createtime" property="createtime" />
+	</collection>
+  </resultMap>
+  
+  <sql id="Base_Column_List">
+    f_id, f_title, f_subtitle, f_summary, f_delete_status, u_group_name, f_creator_id, 
+    f_creator_name, f_create_time, f_update_time
+  </sql>
+  
+  <sql id="Blob_Column_List">
+    f_content
+  </sql>
+  
+  <select id="findById" parameterType="long" resultMap="financialProductAllMap" flushCache="true" useCache="true">
+    select 
+    f.f_id, f.f_title, f.f_subtitle, f.f_summary, f.f_delete_status, f.u_group_name, f.f_creator_id, 
+    f.f_creator_name, f.f_create_time, f.f_update_time, f.f_content,
+    a.id, a.name, a.type, a.size, a.path, a.url, a.fk_table, a.fk_id_name, a.fk_id, a.status, a.creator_id, 
+    a.creator_name, a.createtime
+    from tb_financial_product f LEFT JOIN tb_attachment a ON a.fk_table='tb_financial_product'
+    and a.fk_id_name='f_id' and a.fk_id=f.f_id
+    where f_id = ${id}
+  </select>
+  
+  <!-- 分页查询列表 -->
+  <select id="queryListByPage" parameterType="Map" resultMap="financialProductMap" flushCache="true" useCache="true">
+		SELECT <include refid="Base_Column_List" />
+		FROM tb_financial_product 
+		<where>
+			<if test="title != null and title != ''">
+				and f_title like CONCAT('%','${title}','%' )  
+			</if>
+			<if test="deleteStatus != null ">
+				and f_delete_status = #{deleteStatus,jdbcType=INTEGER}
+			</if>
+			<if test="groupName == null or groupName == '' ">
+				and u_group_name is null
+			</if>
+			<if test="groupName != null ">
+				and u_group_name = #{groupName,jdbcType=VARCHAR}
+			</if>
+		</where>
+	</select>
+	
+  <!-- 查询所有 -->
+  <select id="queryListAll" parameterType="Map" resultMap="financialProductMap" flushCache="true" useCache="true">
+		SELECT <include refid="Base_Column_List" />
+		FROM tb_financial_product 
+		WHERE f_delete_status = 0
+  </select>
+  
+  <delete id="deleteById" parameterType="int">
+    delete from tb_financial_product
+    where f_id = ${id}
+  </delete>
+  
+  <delete id="deleteBatchById" parameterType="list">
+		<![CDATA[  
+       delete from tb_financial_product where f_id in  
+    	]]>  
+	    <foreach collection="list" item = "id" open="(" separator="," close=")">
+	    #{id}  
+	    </foreach>  
+	</delete>
+  
+  <insert id="insert" parameterType="com.jianeye.cuckoo3.webside.financialProduct.model.FinancialProduct" useGeneratedKeys="true" keyProperty="id">
+    insert into tb_financial_product ( f_title, f_subtitle, 
+      f_summary, f_delete_status, u_group_name, 
+      f_creator_id, f_creator_name, f_create_time, 
+      f_update_time, f_content)
+    values ( #{title,jdbcType=VARCHAR}, #{subtitle,jdbcType=VARCHAR}, 
+      #{summary,jdbcType=VARCHAR}, #{deleteStatus,jdbcType=INTEGER}, #{groupName,jdbcType=VARCHAR}, 
+      #{creatorId,jdbcType=INTEGER}, #{creatorName,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP}, #{content,jdbcType=LONGVARCHAR})
+  </insert>
+  
+  <insert id="insertSelective" parameterType="com.jianeye.cuckoo3.webside.financialProduct.model.FinancialProduct" useGeneratedKeys="true" keyProperty="id">
+    insert into tb_financial_product
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        f_id,
+      </if>
+      <if test="title != null">
+        f_title,
+      </if>
+      <if test="subtitle != null">
+        f_subtitle,
+      </if>
+      <if test="summary != null">
+        f_summary,
+      </if>
+      <if test="deleteStatus != null">
+        f_delete_status,
+      </if>
+      <if test="groupName != null">
+        u_group_name,
+      </if>
+      <if test="creatorId != null">
+        f_creator_id,
+      </if>
+      <if test="creatorName != null">
+        f_creator_name,
+      </if>
+      <if test="createTime != null">
+        f_create_time,
+      </if>
+      <if test="updateTime != null">
+        f_update_time,
+      </if>
+      <if test="content != null">
+        f_content,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ${id}
+      </if>
+      <if test="title != null">
+        #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="subtitle != null">
+        #{subtitle,jdbcType=VARCHAR},
+      </if>
+      <if test="summary != null">
+        #{summary,jdbcType=VARCHAR},
+      </if>
+      <if test="deleteStatus != null">
+        #{deleteStatus,jdbcType=INTEGER},
+      </if>
+      <if test="groupName != null">
+        #{groupName,jdbcType=VARCHAR},
+      </if>
+      <if test="creatorId != null">
+        #{creatorId,jdbcType=INTEGER},
+      </if>
+      <if test="creatorName != null">
+        #{creatorName,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="content != null">
+        #{content,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  
+  <update id="update" parameterType="com.jianeye.cuckoo3.webside.financialProduct.model.FinancialProduct">
+    update tb_financial_product
+    <set>
+      <if test="title != null">
+        f_title = #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="subtitle != null">
+        f_subtitle = #{subtitle,jdbcType=VARCHAR},
+      </if>
+      <if test="summary != null">
+        f_summary = #{summary,jdbcType=VARCHAR},
+      </if>
+      <if test="deleteStatus != null">
+        f_delete_status = #{deleteStatus,jdbcType=INTEGER},
+      </if>
+      <if test="groupName != null">
+        u_group_name = #{groupName,jdbcType=VARCHAR},
+      </if>
+      <if test="creatorId != null">
+        f_creator_id = #{creatorId,jdbcType=INTEGER},
+      </if>
+      <if test="creatorName != null">
+        f_creator_name = #{creatorName,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        f_create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        f_update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="content != null">
+        f_content = #{content,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where f_id = ${id}
+  </update>
+  
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.jianeye.cuckoo3.webside.financialProduct.model.FinancialProduct">
+    update tb_financial_product
+    set f_title = #{title,jdbcType=VARCHAR},
+      f_subtitle = #{subtitle,jdbcType=VARCHAR},
+      f_summary = #{summary,jdbcType=VARCHAR},
+      f_delete_status = #{deleteStatus,jdbcType=INTEGER},
+      u_group_name = #{groupName,jdbcType=VARCHAR},
+      f_creator_id = #{creatorId,jdbcType=INTEGER},
+      f_creator_name = #{creatorName,jdbcType=VARCHAR},
+      f_create_time = #{createTime,jdbcType=TIMESTAMP},
+      f_update_time = #{updateTime,jdbcType=TIMESTAMP},
+      f_content = #{content,jdbcType=LONGVARCHAR}
+    where f_id = ${id}
+  </update>
+  
+  <update id="updateByPrimaryKey" parameterType="com.jianeye.cuckoo3.webside.financialProduct.model.FinancialProduct">
+    update tb_financial_product
+    set f_title = #{title,jdbcType=VARCHAR},
+      f_subtitle = #{subtitle,jdbcType=VARCHAR},
+      f_summary = #{summary,jdbcType=VARCHAR},
+      f_delete_status = #{deleteStatus,jdbcType=INTEGER},
+      u_group_name = #{groupName,jdbcType=VARCHAR},
+      f_creator_id = #{creatorId,jdbcType=INTEGER},
+      f_creator_name = #{creatorName,jdbcType=VARCHAR},
+      f_create_time = #{createTime,jdbcType=TIMESTAMP},
+      f_update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where f_id = ${id}
+  </update>
+</mapper>

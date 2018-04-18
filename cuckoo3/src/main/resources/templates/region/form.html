@@ -1,0 +1,128 @@
+<link rel="stylesheet"	th:href="@{/js/select2/select2.min.css}" />
+<script type="text/javascript"	th:src="@{/js/select2/select2.min.js}"></script>
+<script type="text/javascript"	th:src="@{/js/select2/zh-CN.js}"></script>
+<script type="text/javascript" th:inline="JavaScript">
+<![CDATA[
+	function initRoleData(){
+		var options = "<option value=''></option>";
+		var u = [[${regionEntity}]];
+		var rlist = [[${roleList}]];
+		var us = [[${session.userSession}]];
+		var rname = us.role.name;
+		if(u){
+			for(var r in rlist){
+				var role = rlist[r];
+				if(rname == "超级管理员"){
+					if(role.name != "超级管理员"){
+						if(u.role.id == role.id){
+							options += "<option value='"+role.id+"' selected='selected' >"+role.name+"</option>";
+						}else{
+							options += "<option value='"+role.id+"' >"+role.name+"</option>";
+						}
+					}
+				}else if(rname == "管理员"){
+					if(role.name != "超级管理员" && role.name != "管理员"){
+						if(u.role.id == role.id){
+							options += "<option value='"+role.id+"' selected='selected' >"+role.name+"</option>";
+						}else{
+							options += "<option value='"+role.id+"' >"+role.name+"</option>";
+						}
+					}
+				}
+			}
+		}else{
+			for(var r in rlist ){
+				var role = rlist[r];
+				if(rname == "超级管理员"){
+					if(role.name != "超级管理员"){
+						options += "<option value='"+role.id+"' >"+role.name+"</option>";
+					}
+				}else if(rname == "管理员"){
+					if(role.name != "超级管理员" && role.name != "管理员"){
+						options += "<option value='"+role.id+"' >"+role.name+"</option>";
+					}
+				}else{
+					options += "<option value='"+role.id+"' >"+role.name+"</option>";
+				}
+			}
+		}
+		$("#roleId").html(options);
+	}
+]]>
+</script>
+<script type="text/javascript"	th:src="@{/js/customer/region/form.js}"></script>
+	
+<div class="page-header">
+	<h1 th:text="${regionEntity} ? '编辑区域':'新增区域'">
+	</h1>
+</div>
+<div class="row" style="margin-top:5px;">
+	<div class="col-xs-12">
+		<form id="regionForm" name="regionForm" class="form-horizontal" role="form" method="post">
+		<div th:if="${regionEntity}">
+			<input type="hidden" id="pageNum" name="pageNum" th:value="${page.pageNum }"/>
+			<input type="hidden" id="pageSize" name="pageSize" th:value="${page.pageSize }"/>
+			<input type="hidden" id="orderByColumn" name="orderByColumn" th:value="${page.orderByColumn }"/>
+			<input type="hidden" id="orderByType" name="orderByType" th:value="${page.orderByType }"/>
+			<input type="hidden" name="id" id="regionId" th:value="${regionEntity.id }"/>
+		</div>
+		   <div class="form-group">
+		      <label class="control-label col-sm-1 no-padding-right" for="regionName">区域名称</label>
+		      <div class="col-sm-10">
+		      <div class="clearfix">
+		         <input th:readonly ="${regionEntity}?'true':'false'" class="form-control" name="regionName" id="regionName"
+		           th:value="${regionEntity?.regionName }" placeholder="区域名称,系统上线区域的标识..."/>
+		      </div>
+		      </div>
+		   </div>		   
+		   <div class="form-group">
+		      <label class="control-label col-sm-1 no-padding-right" for="roleName">所属角色</label>
+		      <div class="col-sm-10">
+		      <div class="clearfix">
+		        	<select class="form-control" name="role.id" id="roleId" style="width: 100%">
+					</select>
+				</div>
+		      </div>
+		   </div> 
+		   <div class="form-group">
+		      <label class="control-label col-sm-1 no-padding-right" for="description">描述</label>
+		      <div class="col-sm-10">
+		      <div class="clearfix">
+		         <input class="form-control" name="description" id="description" type="text"
+		          th:value="${regionEntity?.description }" placeholder="描述..."/>
+		      </div>
+		      </div>
+		   </div> 
+		   <div class="form-group">
+		      <label class="control-label col-sm-1 no-padding-right" for="deleteStatus">逻辑删除状态</label>
+		      <div class="col-sm-4">
+			      <label>
+			         <input class="ace ace-switch ace-switch-6" type="checkbox" name="deleteStatus" id="deleteStatus"
+			         th:value="${regionEntity?.deleteStatus }" onclick="checkboxValue(this)"
+				     th:checked="${regionEntity?.deleteStatus eq 1}?'checked'" />
+			         <span class="lbl"></span>
+			      </label>
+		      </div>
+		      <label class="control-label col-sm-1 no-padding-right" for="locked">是否锁定</label>
+		      <div class="col-sm-4">
+			      <label>
+			         <input class="ace ace-switch ace-switch-6" type="checkbox" name="locked" id="locked"
+			         th:value="${regionEntity?.locked }" onclick="checkboxValue(this)"
+			         th:checked="${regionEntity?.locked eq 1}?'checked'" />
+			         <span class="lbl"></span>
+			      </label>
+		      </div>
+		   </div>
+		</form>
+		<div class="hr hr-dotted"></div>
+	</div>
+</div>
+<div class="center" th:with="nempty=${regionEntity}?'true':'false'">
+	<button id="btnAdd" type="button" onclick="javascript:$('#regionForm').submit();" class="btn btn-success btn-sm">
+	  	<i class="fa fa-user-plus"></i>&nbsp;
+	  	<span th:text="${regionEntity} ? '保存':'添加'"></span>
+	</button>
+	<button id="btn" type="button" th:onclick="'javascript:webside.common.goback(&quot;/region/listUI.html&quot; ,'+${nempty}+')'" class="btn btn-info btn-sm">
+		<i class="fa fa-undo"></i>&nbsp;返回
+	</button>
+</div>

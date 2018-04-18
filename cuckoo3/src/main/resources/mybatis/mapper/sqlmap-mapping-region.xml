@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jianeye.cuckoo3.webside.region.mapper.RegionMapper">
+	<!--mybatis ehcache缓存配置,以下两个<cache>标签二选一,第一个可以输出日志,第二个不输出日志 -->
+	<cache type="org.mybatis.caches.ehcache.LoggingEhcache"/> 
+	<!-- <cache type="org.mybatis.caches.ehcache.EhcacheCache"/> -->
+
+	<sql id="regionAttributes">
+		id, region_name, delete_status, locked, description, creator_id, create_time, update_time
+	</sql>
+
+	<resultMap id="regionMap" type="com.jianeye.cuckoo3.webside.region.model.Region">
+		<id column="id" property="id"/>
+	    <result column="region_name" property="regionName" jdbcType="VARCHAR" />
+	    <result column="delete_status" property="deleteStatus" jdbcType="INTEGER" />
+	    <result column="locked" property="locked" jdbcType="INTEGER" />
+	    <result column="description" property="description" jdbcType="VARCHAR" />
+	    <result column="creator_id" property="creatorId" jdbcType="INTEGER" />
+	    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+	    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+		<association property="role" column="id" javaType="com.jianeye.cuckoo3.webside.role.model.RoleEntity">
+			<id property="id" column="r_id"/>
+			<result property="name" column="r_name"/>
+			<result property="key" column="r_key"/>
+			<result property="status" column="r_status"/>
+			<result property="description" column="r_description"/>
+			<result property="createTime" column="r_create_time"/>
+			<result property="updateTime" column="r_update_time"/>
+		</association>
+	</resultMap>
+	
+	<select id="queryListByPage" parameterType="Map" resultMap="regionMap" flushCache="true" useCache="true">
+		SELECT reg.id,
+		reg.region_name,
+		reg.delete_status,
+		reg.locked,
+		reg.description,
+		reg.creator_id,
+		reg.create_time,
+		reg.update_time,
+		r.r_id,
+		r.r_name,
+		r.r_key,
+		r.r_status,
+		r.r_description,
+		r.r_create_time,
+		r.r_update_time
+		FROM tb_region reg LEFT JOIN tb_role_region rr ON reg.id = rr.reg_id LEFT JOIN tb_role r ON rr.r_id = r.r_id 
+		<where>
+			<if test="regionName != null and regionName != ''">
+				reg.region_name like CONCAT('%', #{regionName}, '%')
+			</if>
+		</where>
+	</select>
+	
+	<select id="findByName" parameterType="String" resultMap="regionMap" flushCache="true" useCache="true">
+		SELECT reg.id,
+		reg.region_name,
+		reg.delete_status,
+		reg.locked,
+		reg.description,
+		reg.creator_id,
+		reg.create_time,
+		reg.update_time,
+		r.r_id,
+		r.r_name,
+		r.r_key,
+		r.r_status,
+		r.r_description,
+		r.r_create_time,
+		r.r_update_time
+		FROM tb_region reg LEFT JOIN tb_role_region rr ON reg.id = rr.reg_id LEFT JOIN tb_role r ON rr.r_id = r.r_id 
+		where reg.region_name = #{name}
+	</select>
+	
+	<select id="findById" parameterType="long" resultMap="regionMap" flushCache="true" useCache="true">
+		SELECT reg.id,
+		reg.region_name,
+		reg.delete_status,
+		reg.locked,
+		reg.description,
+		reg.creator_id,
+		reg.create_time,
+		reg.update_time,
+		r.r_id,
+		r.r_name,
+		r.r_key,
+		r.r_status,
+		r.r_description,
+		r.r_create_time,
+		r.r_update_time
+		FROM tb_region reg LEFT JOIN tb_role_region rr ON reg.id = rr.reg_id LEFT JOIN tb_role r ON rr.r_id = r.r_id 
+		where reg.id = ${id}		
+	</select>
+	
+	<!-- 用于用户注册，会查询所有记录 -->
+	<select id="queryListAll" parameterType="Long" resultMap="regionMap" flushCache="false" useCache="true">
+		SELECT reg.id,
+		reg.region_name,
+		reg.delete_status,
+		reg.locked,
+		reg.description,
+		reg.creator_id,
+		reg.create_time,
+		reg.update_time,
+		r.r_id,
+		r.r_name,
+		r.r_key,
+		r.r_status,
+		r.r_description,
+		r.r_create_time,
+		r.r_update_time
+		FROM tb_region reg LEFT JOIN tb_role_region rr ON reg.id = rr.reg_id LEFT JOIN tb_role r ON rr.r_id = r.r_id 
+		WHERE reg.delete_status=0 and reg.locked=0
+	</select>
+	
+	<insert id="insert" parameterType="com.jianeye.cuckoo3.webside.region.model.Region" useGeneratedKeys="true" keyProperty="id">
+		insert ignore into tb_region (
+			region_name, 
+			delete_status, 
+      		locked, 
+      		description, 
+      		creator_id, 
+      		create_time, 
+      		update_time
+			)   
+		values (
+			#{regionName,jdbcType=VARCHAR}, 
+			#{deleteStatus,jdbcType=INTEGER}, 
+		    #{locked,jdbcType=INTEGER}, 
+		    #{description,jdbcType=VARCHAR}, 
+		    #{creatorId,jdbcType=INTEGER}, 
+		    #{createTime,jdbcType=TIMESTAMP}, 
+		    #{updateTime,jdbcType=TIMESTAMP}
+			)  
+	</insert>
+	
+	<insert id="insertRegionRole" parameterType="com.jianeye.cuckoo3.webside.region.model.Region" useGeneratedKeys="true" keyProperty="role.id">
+		insert ignore into tb_role_region (
+			reg_id,
+			r_id,
+			t_create_time
+			)   
+		values (
+			#{id},
+			#{role.id},
+			now()
+			)  
+	</insert>
+	
+	<update id="update" parameterType="com.jianeye.cuckoo3.webside.region.model.Region" flushCache="true">
+		update tb_region
+		<set >
+	      <if test="regionName != null" >
+	        region_name = #{regionName,jdbcType=VARCHAR},
+	      </if>
+	      <if test="deleteStatus != null" >
+	        delete_status = #{deleteStatus,jdbcType=INTEGER},
+	      </if>
+	      <if test="locked != null" >
+	        locked = #{locked,jdbcType=INTEGER},
+	      </if>
+	      <if test="description != null" >
+	        description = #{description,jdbcType=VARCHAR},
+	      </if>
+	      <if test="creatorId != null" >
+	        creator_id = #{creatorId,jdbcType=INTEGER},
+	      </if>
+	      <if test="createTime != null" >
+	        create_time = #{createTime,jdbcType=TIMESTAMP},
+	      </if>
+	      <if test="updateTime != null" >
+	        update_time = #{updateTime,jdbcType=TIMESTAMP},
+	      </if>
+	    </set>
+		where id = ${id}
+	</update>
+	
+	<update id="updateRegionRole" parameterType="com.jianeye.cuckoo3.webside.region.model.Region" flushCache="true">
+		update tb_role_region
+		set r_id = ${role.id}
+		where reg_id = ${id}
+	</update>
+	
+	<delete id="deleteBatchById" parameterType="list">
+		<![CDATA[  
+       delete from tb_region where id in  
+    	]]>  
+	    <foreach collection="list" item = "id" open="(" separator="," close=")">
+	    #{id}  
+	    </foreach>  
+	</delete>
+	
+	<delete id="deleteBatchRegionRole" parameterType="list">
+		<![CDATA[  
+       delete from tb_role_region where reg_id in  
+    	]]>  
+	    <foreach collection="list" item = "id" open="(" separator="," close=")">
+	    #{id}  
+	    </foreach>  
+	</delete>
+	
+</mapper>

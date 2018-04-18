@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh-cn" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>税银平台—免责声明</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Cache-Control" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+<meta http-equiv="X-UA-Compatible" content="E=edge;chrome=1" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="keywords" content="cuckoo,响应式前端解决方案,一站式架构设计,基础功能模块" />
+<meta name="description" content="cuckoo,响应式前端解决方案,一站式架构设计,基础功能模块" />
+<meta name="viewport"
+	content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<link th:href="@{/images/cuckoo16.ico}" rel="icon" />
+<link th:href="@{/images/cuckoo16.ico}" type="image/x-icon"
+	rel="bookmark" />
+<link th:href="@{/images/cuckoo16.ico}" type="image/x-icon"
+	rel="shortcut icon" />
+<!-- bootstrap & fontawesome -->
+<link rel="stylesheet"
+	th:href="@{/js/bootstrap/bootstrap.min.css}" />
+<style>
+* {
+	margin: 0;
+	padding: 0;
+}
+
+nav {
+	display:table;
+	border: 1px solid #505255;
+	border-bottom: 1px solid #282C2F;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	 margin:50px auto;
+	-webkit-box-shadow: 1px 1px 3px #292929;
+	-moz-box-shadow: 1px 1px 3px #292929;
+}
+
+li {
+	list-style: none;
+	float: left;
+	border-right: 1px solid #2E3235;
+	position: relative;
+	/*background: -moz-linear-gradient(top, #fff, #555D5F 2% ,#555D5F 50%,#3E4245 100%); 
+background: -webkit-gradient(linear, 0 0, 0 100%, from(#fff), color-stop(2%, #555D5F), color-stop(50%, #555D5F),to(#3E4245));*/
+	background: #555D5F;
+}
+
+li:hover {
+	/*background: -moz-linear-gradient(top, #fff, #3E4245 2% ,#555D5F 80%,#555D5F 100%); 
+background: -webkit-gradient(linear, 0 0, 0 100%, from(#fff), color-stop(2%, #3E4245), color-stop(80%, #3E4245),to(#555D5F));*/
+	background: #3E4245;
+	-moz-transition: background 1s ease-out;
+	-webkit-transition: background 1s ease-out;
+}
+
+li a {
+	display: block;
+	height: 40px;
+	line-height: 40px;
+	padding: 0 30px;
+	font-size: 12px;
+	color: #fff;
+	text-shadow: 0px -1px 0px #000;
+	text-decoration: none;
+	white-space: nowrap;
+	border-left: 1px solid #999E9F;
+	border-top: 1px solid #999E9F;
+	-moz-border-top-left-radius: 2px;
+	-webkit-border-top-left-radius: 2px;
+	z-index: 100;
+}
+
+li>a {
+	position: relative;
+}
+
+li.first a {
+	-moz-border-radius-topleft: 4px;
+	-moz-border-radius-bottomleft: 4px;
+	-webkit-border-top-left-radius: 4px;
+	-webkit-border-bottom-left-radius: 4px;
+}
+
+li.last {
+	border-right: 0 none;
+}
+
+dl {
+	position: absolute;
+	display: block;
+	top: 40px;
+	left: -25px;
+	width: 165px;
+	background: #222222;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	-webkit-box-shadow: 1px 1px 3px #292929;
+	-moz-box-shadow: 1px 1px 3px #292929;
+	z-index: 10;
+}
+
+li:hover dl {
+	top: 50px;
+	display: block;
+	width: 145px;
+	padding: 10px;
+}
+
+dl a {
+	background: transparent;
+	border: 0 none;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	-moz-transition: background 0.5s ease-out;
+	-webkit-transition: background 0.5s ease-out;
+	z-index: 50;
+}
+
+dl a:hover {
+	color: #FFF;
+	background: #999E9F;
+	-moz-transition: background 0.3s ease-in-out, color 0.3s ease-in-out;
+	-webkit-transition: background 0.3s ease-in-out, color 0.3s ease-in-out;
+}
+
+dd {
+	margin-top: -40px;
+	opacity: 0;
+	width: 145px;
+	-webkit-transition-property: all;
+	/*-webkit-transition-timing-function: cubic-bezier(5,0,5,0);*/
+	-moz-transition-property: all;
+	/*-moz-transition-timing-function: cubic-bezier(5,0,5,0);*/
+	/*-webkit-transition-delay:5s; 
+-moz-transition-delay:5s;*/
+}
+
+li:hover dd {
+	margin-top: 0;
+	opacity: 1;
+}
+
+li dd:nth-child(1) {
+	-webkit-transition-duration: 0.1s;
+	-moz-transition-duration: 0.1s;
+}
+
+li dd:nth-child(2) {
+	-webkit-transition-duration: 0.2s;
+	-moz-transition-duration: 0.2s;
+}
+
+li dd:nth-child(3) {
+	-webkit-transition-duration: 0.3s;
+	-moz-transition-duration: 0.3s;
+}
+
+li dd:nth-child(4) {
+	-webkit-transition-duration: 0.4s;
+	-moz-transition-duration: 0.4s;
+}
+
+dt {
+	display: none;
+	margin-top: -25px;
+	padding-top: 15px;
+	height: 10px;
+}
+
+li:hover dt {
+	display: block;
+}
+
+.Darrow {
+	float: right;
+	margin: 18px 10px 0 0;
+	border-width: 5px;
+	border-color: #FFF transparent transparent transparent;
+	border-style: solid;
+	width: 0;
+	height: 0;
+	line-height: 0;
+	overflow: hidden;
+	cursor: pointer;
+	text-shadow: 0px -1px 0px #000;
+	-webkit-box-shadow: 0px -1px 0px #000;
+	-moz-box-shadow: 0px -1px 0px #000;
+}
+
+.arrow {
+	margin: 0 auto;
+	margin-top: -5px;
+	display: block;
+	width: 10px;
+	height: 10px;
+	background: #222222;
+	-webkit-transform: rotate(45deg);
+	-moz-transform: rotate(45deg);
+}
+</style>		
+<!-- JQuery script -->
+<!--[if !IE]><!-->
+<script type="text/javascript"
+	th:src="@{/js/jquery/jquery-2.1.4.min.js}"></script>
+<!--<![endif]-->
+<!--[if IE]>
+	<script type="text/javascript" src="${ctx }/resources/js/jquery/jquery-1.11.3.min.js"></script>
+<![endif]-->
+<!-- basic scripts -->
+<!-- <script type="text/javascript">
+	if ("ontouchend" in document)
+		document.write("<script src='${ctx }/resources/js/jquery/jquery.mobile.custom.min.js'>" + "<"+"script>");
+</script> -->
+
+<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!--[if lt IE 9]>
+	<script type="text/javascript" src="${ctx }/resources/js/ie/html5shiv.min.js"></script>
+	<script type="text/javascript" src="${ctx }/resources/js/ie/respond.min.js"></script>
+<![endif]-->
+</head>
+<body>
+	<nav>
+	<ul class="clear">
+		<li class="first"><a th:href="@{/}">主页</a></li>
+		<li><span class="Darrow"></span> <a href="#">金融产品</a>
+			<dl>
+				<dt>
+					<span class="arrow"></span>
+				</dt>
+				<dd>
+					<a href="#">银行产品</a>
+				</dd>
+				<dd>
+					<a href="#">保险产品</a>
+				</dd>
+			</dl></li>
+		<li><a href="#">政策动态</a></li>
+		<li><a href="#">银行动态</a></li>
+		<li><a th:href="@{/sypt/disclaimer.html}">免责声明</a></li>
+		<li class="last"><a th:href="@{/index.html}">我的账户</a></li>
+	</ul>
+	</nav>
+	
+	<div class="container">
+		<div class="mybreadcrumb">
+			<span>当前位置：免责声明</span>			
+		</div>
+		<div class="disclaimerBody">
+			<h3 class="text-center">免责声明</h3>
+			<div id="content">
+			&nbsp;&nbsp;&nbsp;&nbsp;网站（以下简称“税银平台”）是面向小微企业开通的网络服务平台，为小微企业提供税银联动服务。
+			<p>&nbsp;&nbsp;&nbsp;&nbsp;一、基于税银平台所提供服务的特点，用户应按要求向税银平台提供详尽、准确的资料，并在所提供的资料发生变更时，及时更新在税银平台的资料。
+			因用户资料详尽性、准确性造成无法获得相关服务，税银平台不承担任何责任。
+			</p>
+			<p>&nbsp;&nbsp;&nbsp;&nbsp;二、用户一旦注册成功，即成为税银平台的合法用户，用户应妥善保管账号和密码。
+			因用户原因造成的账号、密码泄露带来的损失，税银平台不承担任何责任。
+			用户若发现任何非法使用用户账号或存在安全漏洞的情况，请立即通知税银平台。
+			</p>
+			<p>&nbsp;&nbsp;&nbsp;&nbsp;三、税银平台尊重用户隐私和数据安全，将确保在未经用户合法授权时不会公开、编辑或透露给第三方其注册资料及其它保存在税银平台中的非公开内容，除非有专门的法律要求。
+			</p>
+			<p>&nbsp;&nbsp;&nbsp;&nbsp;……这一大堆东西应该放到数据库中……
+			</p>
+			</div>
+		</div>
+	</div>
+	
+</body>
+</html>

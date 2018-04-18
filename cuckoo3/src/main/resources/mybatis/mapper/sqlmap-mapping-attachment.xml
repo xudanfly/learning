@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jianeye.cuckoo3.webside.attachment.mapper.AttachmentMapper">
+  <resultMap id="attachmentMap" type="com.jianeye.cuckoo3.webside.attachment.model.Attachment">
+    <id column="id" property="id" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="type" jdbcType="VARCHAR" property="type" />
+    <result column="size" jdbcType="BIGINT" property="size" />
+    <result column="path" jdbcType="VARCHAR" property="path" />
+    <result column="url" jdbcType="VARCHAR" property="url" />
+    <result column="fk_table" jdbcType="VARCHAR" property="fkTable" />
+    <result column="fk_id_name" jdbcType="VARCHAR" property="fkIdName" />
+    <result column="fk_id" jdbcType="BIGINT" property="fkId" />
+    <result column="status" jdbcType="VARCHAR" property="status" />
+    <result column="creator_id" jdbcType="INTEGER" property="creatorId" />
+    <result column="creator_name" jdbcType="VARCHAR" property="creatorName" />
+    <result column="createtime" jdbcType="TIMESTAMP" property="createtime" />
+  </resultMap>
+  
+  <sql id="Base_Column_List">
+    id, name, type, size, path, url, fk_table, fk_id_name, fk_id, status, creator_id, 
+    creator_name, createtime
+  </sql>
+  
+  <select id="findById" parameterType="java.lang.Long" resultMap="attachmentMap">
+    select 
+    <include refid="Base_Column_List" />
+    from tb_attachment
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  
+  <select id="findByUrl" parameterType="java.lang.String" resultMap="attachmentMap">
+    select 
+    <include refid="Base_Column_List" />
+    from tb_attachment
+    where url = #{url,jdbcType=VARCHAR}
+  </select>
+  
+  <!-- 分页查询列表 -->
+  <select id="queryListByPage" parameterType="Map" resultMap="attachmentMap" flushCache="true" useCache="true">
+		SELECT <include refid="Base_Column_List" />
+		FROM tb_attachment 
+		<where>
+			<if test="name != null and name != ''">
+				and name like CONCAT('%','${name}','%' )  
+			</if>
+			<if test="status != null ">
+				and status = ${status}
+			</if>
+			<if test="fkTable != null and fkTable != '' ">
+				and fk_table = #{fkTable,jdbcType=VARCHAR}
+			</if>
+			<if test="fkIdName != null and fkIdName != '' ">
+				and fk_id_name = #{fkIdName,jdbcType=VARCHAR}
+			</if>
+			<if test="fkId != null ">
+				and fk_id = ${fkId}
+			</if>
+		</where>
+	</select>
+	
+	<!-- 查询所有，不分页；添加了查询条件 -->
+  <select id="queryListAll" parameterType="Map" resultMap="attachmentMap" flushCache="true" useCache="true">
+		SELECT <include refid="Base_Column_List" />
+		FROM tb_attachment 
+		<where>
+			<if test="name != null and name != ''">
+				and name like CONCAT('%','${name}','%' )  
+			</if>
+			<if test="status != null ">
+				and status = ${status}
+			</if>
+			<if test="fkTable != null and fkTable != '' ">
+				and fk_table = #{fkTable,jdbcType=VARCHAR}
+			</if>
+			<if test="fkIdName != null and fkIdName != '' ">
+				and fk_id_name = #{fkIdName,jdbcType=VARCHAR}
+			</if>
+			<if test="fkId != null ">
+				and fk_id = ${fkId}
+			</if>
+			<if test="urls != null ">
+				and url in 
+				<foreach collection="urls" item = "url" open="(" separator="," close=")">
+			    	#{url,jdbcType=VARCHAR}  
+			    </foreach>  
+		    </if>
+		    <if test="fkIds != null ">
+				and fk_id in 
+				<foreach collection="fkIds" item = "fkId" open="(" separator="," close=")">
+			    	#{fkId}  
+			    </foreach>  
+		    </if>
+		</where>
+	</select>
+	
+  <delete id="deleteById" parameterType="int">
+    delete from tb_attachment
+    where id = ${id}
+  </delete>
+  
+  <delete id="deleteBatchById" parameterType="java.util.List">
+	<![CDATA[  
+      delete from tb_attachment where id in  
+   	]]>  
+    <foreach collection="list" item = "id" open="(" separator="," close=")">
+    #{id}  
+    </foreach>  
+  </delete>
+  
+ 
+  <insert id="insert" parameterType="com.jianeye.cuckoo3.webside.attachment.model.Attachment" useGeneratedKeys="true" keyProperty="id">
+    insert into tb_attachment (name, type, 
+      size, path, url, fk_id_name, 
+      fk_table, fk_id, status, 
+      creator_id, creator_name, createtime
+      )
+    values ( #{name,jdbcType=VARCHAR}, #{type,jdbcType=VARCHAR}, 
+      #{size,jdbcType=BIGINT}, #{path,jdbcType=VARCHAR}, #{url,jdbcType=VARCHAR}, #{fkIdName,jdbcType=VARCHAR}, 
+      #{fkTable,jdbcType=BIGINT}, #{fkId,jdbcType=BIGINT}, #{status,jdbcType=VARCHAR}, 
+      #{creatorId,jdbcType=INTEGER}, #{creatorName,jdbcType=VARCHAR}, #{createtime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  
+  <insert id="insertBatch" parameterType="java.util.List" >
+    insert into tb_attachment (name, type, 
+      size, path, url, fk_id_name, 
+      fk_table, fk_id, status, 
+      creator_id, creator_name, createtime
+      )
+    values 
+     <foreach collection="list" item="item" index="index" separator=",">
+    	( 	#{item.name,jdbcType=VARCHAR}, #{item.type,jdbcType=VARCHAR}, 
+      		#{item.size,jdbcType=BIGINT}, #{item.path,jdbcType=VARCHAR}, 
+      		#{item.url,jdbcType=VARCHAR}, #{item.fkIdName,jdbcType=VARCHAR}, 
+      		#{item.fkTable,jdbcType=BIGINT}, #{item.fkId,jdbcType=BIGINT}, 
+      		#{item.status,jdbcType=VARCHAR}, #{item.creatorId,jdbcType=INTEGER},
+      		#{item.creatorName,jdbcType=VARCHAR}, #{item.createtime,jdbcType=TIMESTAMP}
+      	)
+      </foreach>
+  </insert>
+  
+  <insert id="insertSelective" parameterType="com.jianeye.cuckoo3.webside.attachment.model.Attachment" useGeneratedKeys="true" keyProperty="id">
+    insert into tb_attachment
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="name != null">
+        name,
+      </if>
+      <if test="type != null">
+        type,
+      </if>
+      <if test="size != null">
+        size,
+      </if>
+      <if test="path != null">
+        path,
+      </if>
+      <if test="url != null">
+        url,
+      </if>
+      <if test="fkIdName != null">
+        fk_id_name,
+      </if>
+      <if test="fkTable != null">
+        fk_table,
+      </if>
+      <if test="fkId != null">
+        fk_id,
+      </if>
+      <if test="status != null">
+        status,
+      </if>
+      <if test="creatorId != null">
+        creator_id,
+      </if>
+      <if test="creatorName != null">
+        creator_name,
+      </if>
+      <if test="createtime != null">
+        createtime,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="size != null">
+        #{size,jdbcType=BIGINT},
+      </if>
+      <if test="path != null">
+        #{path,jdbcType=VARCHAR},
+      </if>
+      <if test="url != null">
+        #{url,jdbcType=VARCHAR},
+      </if>
+      <if test="fkIdName != null">
+        #{fkIdName,jdbcType=VARCHAR},
+      </if>
+      <if test="fkTable != null">
+        #{fkTable,jdbcType=VARCHAR},
+      </if>
+      <if test="fkId != null">
+        #{fkId,jdbcType=BIGINT},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="creatorId != null">
+        #{creatorId,jdbcType=INTEGER},
+      </if>
+      <if test="creatorName != null">
+        #{creatorName,jdbcType=VARCHAR},
+      </if>
+      <if test="createtime != null">
+        #{createtime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  
+  <update id="update" parameterType="com.jianeye.cuckoo3.webside.attachment.model.Attachment">
+    update tb_attachment
+    <set>
+      <if test="name != null">
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        type = #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="size != null">
+        size = #{size,jdbcType=BIGINT},
+      </if>
+      <if test="path != null">
+        path = #{path,jdbcType=VARCHAR},
+      </if>
+      <if test="url != null">
+        url = #{url,jdbcType=VARCHAR},
+      </if>
+      <if test="fkIdName != null">
+        fk_id_name = #{fkIdName,jdbcType=VARCHAR},
+      </if>
+      <if test="fkTable != null">
+        fk_table = #{fkTable,jdbcType=BIGINT},
+      </if>
+      <if test="fkId != null">
+        fk_id = #{fkId,jdbcType=BIGINT},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="creatorId != null">
+        creator_id = #{creatorId,jdbcType=INTEGER},
+      </if>
+      <if test="creatorName != null">
+        creator_name = #{creatorName,jdbcType=VARCHAR},
+      </if>
+      <if test="createtime != null">
+        createtime = #{createtime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  
+  <!-- 批量删除无用附件，根据附件列表删除，根据fkId删除，根据url反删除（not in）-->
+  <delete id="deleteBatch" parameterType="Map">
+   	<![CDATA[  
+         delete from tb_attachment 
+         where fk_table= #{fkTable,jdbcType=VARCHAR} 
+         and fk_id_name= #{fkIdName,jdbcType=VARCHAR}
+   	]]>  
+   	<if test="attachments != null">
+   		and fk_id= #{fkId,jdbcType=BIGINT}
+   	    and url in  
+	    <foreach collection="attachments" item = "attachment" open="(" separator="," close=")">
+	    	#{attachment.url}  
+	    </foreach>  
+   	</if>
+   	<if test="fkIds != null">
+   		 and fk_id in  
+	   	 <foreach collection="fkIds" item = "fkId" open="(" separator="," close=")">
+	    	#{fkId}  
+	    </foreach>  
+	</if>
+	<if test="urls != null">
+	  	and fk_id= #{fkId,jdbcType=BIGINT}
+        and url not in  
+        <foreach collection="urls" item = "url" open="(" separator="," close=")">
+            #{url}
+        </foreach>  
+    </if>
+  </delete>
+</mapper>

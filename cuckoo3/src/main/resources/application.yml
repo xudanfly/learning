@@ -1,0 +1,80 @@
+server:
+    port: 8899
+    context-path: /
+    session:
+      timeout: 30
+    context-parameters:
+      webAppRootKey: webside.dtgrid.root #系统根目录变量
+      org.apache.sirona.reporting.activated: true   #activated per default
+      org.apache.sirona.reporting.mapping: /sirona  #path in the application default is /sirona 
+
+#log
+logging:
+    config: classpath:logback-spring.xml
+    file: cuckoo3
+    path: /cuckoo3-log/logs   #项目所在盘符
+    level:       
+        com.jianeye.cuckoo3.webside:  DEBUG
+
+
+spring:
+    datasource:
+        name: cuckooDs
+        url: jdbc:mysql://127.0.0.1:3306/taxbankplatform?relaxAutoCommit=true&useUnicode=true&characterEncoding=UTF-8&characterSetResults=UTF-8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&failOverReadOnly=false&useSSL=true
+        username: taxbankplatform
+        password: mysql #SBk1Ap9y7pJJ1tPf2cfwvRYPspmPK2pggFc3iAQ/j0ENk3wFGcoS0f7Dr+LXpxHVIvw+bOTf81b0lpZQr4zkFg==
+        # 使用druid数据源
+        type: com.alibaba.druid.pool.DruidDataSource
+        driverClassName: com.mysql.jdbc.Driver
+        filters: config,wall,slf4j
+        maxActive: 50
+        initialSize: 10
+        maxWait: 60000
+        minIdle: 10
+        timeBetweenEvictionRunsMillis: 60000
+        minEvictableIdleTimeMillis: 300000
+        validationQuery: select 'x'
+        testWhileIdle: true
+        testOnBorrow: false
+        testOnReturn: false
+        poolPreparedStatements: true
+        maxPoolPreparedStatementPerConnectionSize: 20
+        maxOpenPreparedStatements: 100
+        connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000  
+        #config.decrypt=true;config.decrypt.key=MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAKHAqNjds61Ky1CMdMi26Y2hEUxt5eyXmxNADxYgesCMB6V8sS7c647r+CKjxChRQlIeqov8mRn05o33aEACuUcCAwEAAQ==
+        useGlobalDataSourceStat: true
+        removeAbandoned: true
+        removeAbandonedTimeout: 3600
+        logAbandoned: false
+    mvc:
+        view:
+            prefix: /templates/
+            suffix: .html
+    resources:
+        static-locations: classpath:/static/
+    thymeleaf:
+        cache: false
+    redis: # REDIS (RedisProperties) 没有用到
+        database: 0
+        host: 192.168.3.39
+        port: 6379
+        expire: 1800
+        timeout: 10000
+        password: 
+            
+mybatis:   
+    mapperLocations: classpath*:mybatis/mapper/sqlmap-mapping-*.xml
+    typeAliasesPackage: com.jianeye.cuckoo3.webside.*.model
+  
+#webside.properties
+webside:
+    version: 1.0.0
+shiro:
+    hashIterations: 2
+mail:
+    username: zhangmengzhi2005@126.com
+    password: 123456
+    smtpServer: smtp.126.com
+
+#上传文件存放目录
+local_path: D:/cuckoo3/TBP_UPLOAD_DIR/
